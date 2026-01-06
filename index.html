@@ -1,0 +1,1836 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<title>DOREAMON AI Chatbot — SoloLearn (SDK)</title>
+
+<style>
+:root {
+  --bg: #0f1724;
+  --card: #0b1220;
+  --accent: #6ee7b7;
+  --accent2: #60a5fa;
+  --muted: #cdd5e0;
+  --glass: rgba(255,255,255,0.06);
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: "Inter", system-ui, "Segoe UI", Roboto;
+  background: linear-gradient(90deg,violet, #F4A261);
+  color: #ffffff;
+  text-shadow: 0 0 2px rgba(255,255,255,0.2);
+}
+
+.wrap {
+  max-width: 820px;
+  margin: 28px auto;
+  padding: 18px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.25));
+  box-shadow: 0 6px 24px rgba(2,6,23,0.8);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.logo {
+  width: 56px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #041d23;
+  box-shadow: 0 0 12px var(--accent);
+}
+
+h1 { font-size: 18px; margin:0; color:#fff; }
+p.lead { margin:0; color: yellow; /*var(--muted);*/ font-size:13px; }
+
+/* Quantum Controls */
+.quantum-controls {
+  margin: 20px 0;
+  padding: 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  border: 4px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  
+}
+
+
+.quantum-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0px; 
+  position: left;
+  font-size:15px;
+  
+}
+
+.toggle-btn {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background: #374151;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin: 5px;
+  margin-left:30px; 
+}
+
+.toggle-btn.active {
+  background: var(--accent);
+}
+
+.toggle-btn::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
+}
+
+.toggle-btn.active::after {
+  transform: translateX(26px);
+}
+
+.quantum-stats {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.quantum-console {
+  background: rgba(0,0,0,0.6);
+  color: var(--accent);
+  padding: 10px;
+  border-radius: 8px;
+  margin: 10px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid rgba(255,255,255,0.1);
+  line-height: 1.4;
+}
+
+.quantum-badge {
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+  background-size: 400% 400%;
+  animation: gradientShift 3s ease infinite;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 30px;
+  font-size: 10px;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 1px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Deep Think Badge Styling */
+.deep-think-badge {
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: bold;
+    display: inline-block;
+    animation: deepPulse 2s infinite;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+@keyframes deepPulse {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 0 0 5px rgba(255, 107, 107, 0);
+    }
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+    }
+}
+
+
+.chat {
+  height: 520px;
+  background: var(--card);
+  margin-top: 14px;
+  border-radius: 10px;
+  padding: 14px;
+  overflow: auto;
+  scroll-behavior: smooth;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.msg { 
+   display:flex; 
+   gap:10px; 
+   margin-bottom:12px; 
+}
+
+.bubble {
+  max-width:78%;
+  padding:10px 12px;
+  border-radius:12px;
+  line-height:1.55;
+  white-space: pre-line;
+  word-wrap: break-word;
+  font-size:15px;
+  overflow-wrap: break-word;
+}
+
+.user .bubble {
+  margin-left:auto;
+  background: linear-gradient(90deg, #1c2433, #283445);
+  border:1px solid rgba(255,255,255,0.05);
+  color:#e2eaff;
+  font-weight:400;
+}
+
+.ai .bubble {
+  max-width: 95%;
+  background: linear-gradient(135deg,  #2A9CAD, violet); /*var(--glass);*/
+/*border:5px solid , #1e40af;*/
+  color:#ffffff;
+  backdrop-filter: blur(8px);
+  font-weight:400;
+}
+
+/* Heading styles inside chat bubbles */
+.bubble h1 { 
+  font-size: 20px; 
+  margin: 8px 0 6px; color: #fff; 
+}
+
+.bubble h2 {
+  font-size: 15px; 
+  margin: 6px 0; 
+  color: #e9f9f0;
+}
+
+/* Blockquote */
+.bubble blockquote {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-left: 6px solid #00ff66;  /*rgba(110,231,183,0.6);*/
+  background: navy; /*rgba(255,255,255,0.02);*/
+  color: #dff7ee;
+  border-radius: 6px;
+  font-style: italic;
+}
+
+/* Highlight neon kuning */
+.hl {
+  background: #ffff66;
+  color: #000;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Underline text */
+.ul {
+  text-decoration: underline;
+  text-decoration-color: red;
+  color: !important;
+  font-weight: 450;
+  
+}
+
+/* Lists spacing */
+.bubble ul, .bubble ol { 
+  margin: 8px 0 8px 18px; 
+}
+.bubble li { margin: 4px 0; 
+}
+.bubble del { 
+  color: #ffb3b3;
+  text-decoration: line-through; 
+}
+
+.meta { 
+   font-size:12px; 
+   color:var(--muted); 
+   margin-bottom:6px; 
+}
+
+/* fungsi ui butang chat mesej */
+.controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 5px;
+  align-items: flex-start;
+}
+
+.input-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: flex-end; /* Ubah ke flex-end agar butang ikut ke bawah */
+}
+
+.chat-input {
+  flex: 1; 
+  padding: 10px 45px 10px 15px; 
+  border-radius: 30px; 
+  border: 2px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05); 
+  color: #fff; 
+  font-size: 16px; 
+  outline: none; 
+  transition: all 0.3s;
+  width: 100%;
+  resize: none;
+  min-height: 42px; /* Height minimum tetap */
+  max-height: 120px;
+  overflow-y: auto;
+  font-family: inherit;
+  line-height: 1.4;
+  box-sizing: border-box; /* Pastikan padding termasuk dalam height */
+}
+
+
+/* Scrollbar styling untuk textarea - KUNING NEON */
+ .chat-input {
+  direction: rtl; /* Ini akan memindahkan scrollbar ke kiri */
+  text-align: left; /* Pastikan teks tetap rata kiri */
+  unicode-bidi: plaintext; /* Pastikan teks ditampilkan dengan benar */
+ /*padding: 12px 16px;*/
+  box-sizing: border-box;
+  overflow-y: auto;
+  
+  /* BORDER WARNA ASAL - tidak diubah */
+  border: 1px solid #ccc;
+}
+
+.chat-input:focus { 
+  /* BORDER FOCUS WARNA ASAL - tidak diubah */
+  border: 2px solid var(--accent); 
+  box-shadow: 0 0 8px var(--accent);
+  outline: none;
+  background: #162C4F; /*rgba(0,0,0,0.6);*/
+}
+
+/* SCROLLBAR KUNING NEON */
+.chat-input::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-input::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 12px 0;
+  border-radius: 3px;
+}
+
+.chat-input::-webkit-scrollbar-thumb {
+  background: #FFFF00; /* Kuning neon */
+  border-radius: 3px;
+  box-shadow: 0 0 6px #FFFF00; /* Glow effect */
+}
+
+.chat-input::-webkit-scrollbar-thumb:hover {
+  background: #FFD700; /* Kuning lebih terang saat hover */
+  box-shadow: 0 0 8px #FFFF00; /* Glow lebih kuat */
+}
+
+/* Untuk Firefox - SCROLLBAR KUNING NEON */
+.chat-input {
+  scrollbar-width: thin;
+  scrollbar-color:  #FFFF00 transparent;
+}
+
+/* Pastikan placeholder text tetap di kiri */
+.chat-input::placeholder {
+  direction: ltr;
+  text-align: left;
+  color: silver;
+}
+
+.send-btn {
+  position: absolute;
+  right: 5px;
+  bottom: 5px; /* Butang ikut ke bawah */
+  padding: 10px;
+  border-radius: 50%;
+  border: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  color: gold;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 6px var(--accent);
+  transition: all 0.15s ease-in-out;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+.send-btn:hover { 
+  transform: scale(1.05); 
+}
+
+.send-btn[disabled] { 
+  opacity: 0.5; 
+  cursor: not-allowed;
+  transform: none;
+}
+
+.clear-btn {
+  padding: 10px 12px;
+  border-radius: 20px;
+  border: 0;
+  background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+  color: #041d23;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 6px #ff6b6b;
+  transition: transform 0.15s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.clear-btn:hover {
+  transform: scale(1.05);
+}
+
+.clear-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-alowed;
+  transform: none;
+}
+
+/* efeck menaip cursor */
+.typing-cursor::after {
+  content:"✏️"; 
+  display:inline-block; 
+  /*width:10px; height:16px;*/ 
+  margin-left:6px;
+  /*background:#6ee7b7;*/ 
+  /*border-radius:2px;*/
+  animation: blink 0.5s steps(2) infinite;
+  margin-top: 10px;
+  font-size: 24px;
+}
+
+@keyframes blink{50%{opacity:0;}}
+
+.bubble code{ 
+  background: rgba(0,0,0,0.45); 
+  padding:2px 6px; 
+  border-radius:6px; 
+  color:#00ffcc; 
+  font-weight:600; 
+}
+
+.bubble pre{ 
+  background: rgba(0,0,0,0.6); 
+  padding:10px; 
+  border-radius:8px; 
+  overflow:auto; 
+  color:#a7ffeb; 
+  font-size:13px; 
+}
+
+.bubble a{ 
+  color: var(--accent);      
+  text-decoration:underline; 
+}
+
+/* Thinking Animation untuk AI */
+.thinking-animation {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background:#00ff66; /*rgba(255,255,255,0.1);*/
+    border-radius: 20px;
+    margin: 5px 0;
+}
+
+.thinking-dots {
+    display: flex;
+    gap: 4px;
+    
+}
+
+.thinking-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00ff66; /*var(--accent);*/
+    animation: thinkingBounce 1.4s infinite ease-in-out;
+    
+}
+
+.thinking-dot:nth-child(1) { animation-delay: -0.32s; }
+.thinking-dot:nth-child(2) { animation-delay: -0.16s; }
+.thinking-dot:nth-child(3) { animation-delay: 0s; }
+
+@keyframes thinkingBounce {
+    0%, 80%, 100% { 
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% { 
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* Atau alternatif - Typing Indicator */
+.typing-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: navy; /*rgba(110, 231, 183, 0.1);*/
+    border-radius: 18px;
+    border: 0px solid #00ff66; /*rgba(110, 231, 183, 0.3);*/
+    color: #00ff66; /*var(--accent);*/
+    font-size: 14px;
+}
+
+/* sistem bullet (•) */
+ul {
+  padding-left: 25px;
+  list-style-type: none;
+}
+
+ul li {
+  position: relative;
+  margin-bottom: 8px;
+  color: yellow; /*turquoise; /* Warna teks */
+}
+
+ul li::before {
+  content: "•";
+  color: red; /* Bullet warna biru */
+  font-size: 24px;
+  position: absolute;
+  left: -20px;
+  top: -7px;
+  font-weight: bold;
+}
+
+/* ============================================
+   TEXT COLUMNS FOR BUBBLE CHAT
+   ============================================ */
+.columns-container {
+  display: flex;
+  gap: 15px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.text-column {
+  flex: 1;
+  min-width: 280px;
+  padding: 15px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid #2d2d2d;
+  transition: all 0.3s ease;
+  color: #e0e0e0;
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.text-column:hover {
+  border-color: #3498db;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+}
+
+/* ============================================
+📌 TABLE IN COLUMNS - BUBBLE CHAT STYLE 📌
+   ============================================ */
+.text-column .table-container {
+  overflow-x: auto;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #2d2d2d;
+  max-height: 300px;
+  overflow-y: auto;
+  max-width: 100%;
+}
+
+/* Scrollbar styling for table */
+.text-column .table-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.text-column .table-container::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+.text-column .table-container::-webkit-scrollbar-thumb {
+  background: #3498db;
+  border-radius: 3px;
+}
+
+.text-column .table-container::-webkit-scrollbar-thumb:hover {
+  background: #2980b9;
+}
+
+.text-column .markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+  min-width: 400px;
+  background: #2d2d2d;
+}
+
+.text-column .markdown-table th {
+  background: #2c3e50;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #ecf0f1;
+  border-bottom: 2px solid #3498db;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.text-column .markdown-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #3d3d3d;
+  color: #bdc3c7;
+  vertical-align: top;
+}
+
+.text-column .markdown-table tr:last-child td {
+  border-bottom: none;
+}
+
+.text-column .markdown-table tr:hover {
+  background: rgba(52, 152, 219, 0.1);
+}
+
+.text-column .markdown-table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* ============================================
+   CODE BLOCK IN COLUMNS - BUBBLE CHAT STYLE
+   ============================================ */
+.text-column pre {
+  background: #1e1e1e !important;
+  color: #d4d4d4;
+  padding: 15px;
+  border-radius: 8px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  line-height: 1.4;
+  margin: 10px 0;
+  border: 1px solid #333;
+  overflow: auto;
+  max-height: 300px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.text-column pre code {
+  background: transparent !important;
+  color: inherit;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  display: block;
+  white-space: pre;
+}
+
+/* Code block scrollbar */
+.text-column pre::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.text-column pre::-webkit-scrollbar-track {
+  background: #2d2d2d;
+  border-radius: 3px;
+}
+
+.text-column pre::-webkit-scrollbar-thumb {
+  background: #3498db;
+  border-radius: 3px;
+}
+
+.text-column pre::-webkit-scrollbar-thumb:hover {
+  background: #2980b9;
+}
+
+/* Code block header */
+.text-column pre.code-header::before {
+  content: 'CODE';
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #3498db;
+  color: white;
+  padding: 4px 10px;
+  font-size: 0.7em;
+  border-bottom-left-radius: 6px;
+  border-top-right-radius: 7px;
+  font-family: sans-serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   CONTENT INSIDE COLUMNS
+   ============================================ */
+.text-column h3, 
+.text-column h4, 
+.text-column h5, 
+.text-column h6 {
+  margin: 0 0 10px 0;
+  color: #3498db;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333;
+  font-size: 1.1em;
+}
+
+.text-column p {
+  color: #cccccc;
+  line-height: 1.5;
+  margin: 8px 0;
+  font-size: 0.95em;
+}
+
+.text-column ul, 
+.text-column ol {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+.text-column li {
+  margin-bottom: 6px;
+  color: #b0b0b0;
+  font-size: 0.95em;
+}
+
+.text-column .inline-code {
+  background: #2d2d2d;
+  color: #f8f8f2;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85em;
+  border: 1px solid #444;
+}
+
+/* ============================================
+   RESPONSIVE FOR BUBBLE CHAT
+   ============================================ */
+@media (max-width: 768px) {
+  .columns-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .text-column {
+    min-width: 100%;
+    padding: 12px;
+    margin: 0;
+  }
+  
+  .text-column .table-container {
+    max-height: 250px;
+    margin: 8px 0;
+  }
+  
+  .text-column .markdown-table {
+    min-width: 350px;
+    font-size: 0.85em;
+  }
+  
+  .text-column .markdown-table th,
+  .text-column .markdown-table td {
+    padding: 8px 10px;
+  }
+  
+  .text-column pre {
+    max-height: 250px;
+    padding: 12px;
+    font-size: 0.85em;
+    margin: 8px 0;
+  }
+  
+  .text-column h3, 
+  .text-column h4 {
+    font-size: 1em;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .text-column {
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  .text-column .table-container {
+    max-height: 200px;
+  }
+  
+  .text-column .markdown-table {
+    min-width: 300px;
+    font-size: 0.8em;
+  }
+  
+  .text-column .markdown-table th,
+  .text-column .markdown-table td {
+    padding: 6px 8px;
+  }
+  
+  .text-column pre {
+    max-height: 200px;
+    padding: 10px;
+    font-size: 0.8em;
+  }
+  
+  .text-column pre.code-header::before {
+    font-size: 0.65em;
+    padding: 3px 8px;
+  }
+  
+  .text-column p,
+  .text-column li {
+    font-size: 0.9em;
+  }
+}
+
+/* ============================================
+   COMPACT MODE FOR TIGHT SPACES
+   ============================================ */
+.columns-container.compact {
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.columns-container.compact .text-column {
+  padding: 10px;
+  min-width: 200px;
+}
+
+.columns-container.compact .text-column .table-container {
+  max-height: 200px;
+  margin: 8px 0;
+}
+
+.columns-container.compact .text-column pre {
+  max-height: 200px;
+  padding: 10px;
+  margin: 8px 0;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.text-column.blue-border {
+  border-left: 4px solid #3498db;
+}
+
+.text-column.green-border {
+  border-left: 4px solid #2ecc71;
+}
+
+.text-column.purple-border {
+  border-left: 4px solid #9b59b6;
+}
+
+.text-column.orange-border {
+  border-left: 4px solid #e67e22;
+}
+
+/* Table variants */
+.text-column .markdown-table.blue-header th {
+  background: #2980b9;
+}
+
+.text-column .markdown-table.green-header th {
+  background: #27ae60;
+}
+
+.text-column .markdown-table.purple-header th {
+  background: #8e44ad;
+}
+
+/* Code block variants */
+.text-column pre.dark-code {
+  background: #1a1a1a !important;
+  border-color: #2d2d2d;
+}
+
+.text-column pre.blue-code {
+  background: #0d1b2a !important;
+  border-color: #1e3a5f;
+}
+
+.text-column pre.green-code {
+  background: #0d2b1a !important;
+  border-color: #1e5f3a;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.columns-container {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* ============================================
+   BUBBLE CHAT SPECIFIC FIXES
+   ============================================ */
+/* Ensure tables don't overflow chat bubble */
+.chat-message .columns-container,
+.message-content .columns-container,
+.bubble-container .columns-container {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.chat-message .text-column,
+.message-content .text-column,
+.bubble-container .text-column {
+  max-width: calc(100% - 30px) !important;
+  word-wrap: break-word;
+}
+
+/* Prevent horizontal overflow in chat */
+.chat-container .text-column .table-container,
+.chat-container .text-column pre {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+}
+
+/* Ensure proper text wrapping */
+.chat-container .text-column .markdown-table td,
+.chat-container .text-column .markdown-table th {
+  word-break: break-word;
+  white-space: normal;
+  max-width: 200px;
+}
+
+@media (max-width: 480px) {
+  .columns-masonry {
+    column-count: 1;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+  .text-column {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+  }
+  
+  .text-column pre,
+  .text-column .table-container {
+    max-height: none !important;
+    overflow: visible !important;
+    page-break-inside: avoid;
+  }
+  
+  .text-column .markdown-table {
+    min-width: auto !important;
+  }
+}
+
+@media (max-width:520px){ .wrap{ margin:12px; padding:12px;} .chat{ height:420px; } }
+</style>
+
+
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <div class="logo">🐱</div>
+    <div>
+      <h1>DORAEMON AI chatbot</h1>
+      <p class="lead">Ai chatbot generative simulasi quantum & deep think  <b>MALAYSIA</b>🇲🇾</p>
+    </div>
+  </header>
+
+  <!-- Quantum Controls -->
+  <div class="quantum-controls">
+    <div class="quantum-toggle">
+      <span>⚛️ Quantum Mode:</span>
+      <div class="toggle-btn" id="quantumToggle"></div>
+      <span id="quantumStatus">OFF</span>
+    </div>
+    <div class="quantum-stats" id="quantumStats" style="display:none;">
+      Mood: <span id="currentMood">-</span> • Prob: <span id="currentProb">-</span>
+    </div>
+  </div>
+
+  <!-- Quantum Console -->
+  <div class="quantum-console" id="quantumConsole">
+   ⚛️ Quantum deep think Console Ready ♾️...
+  </div>
+
+
+<!--- fungsi ui chat mesej --->
+<div id="chat" class="chat"></div>
+
+
+<!--- fungsi footer text diakhir ui --->
+  <div style="margin-top:10px;font-size:12px;color:var(--muted)">
+  • Ai Model: <strong>Google Gemma</strong> • Platform: <strong>Google GenAI SDK</strong>
+• Pembangun Platform: <strong>Zulkarnain Bin Suyitno</strong>
+  </div>
+  
+<!--- fungsi kotak menaip mesej --->
+<div class="controls-wrapper">
+  <div class="input-container">
+    <textarea 
+      id="input" 
+      class="chat-input" 
+      placeholder="Taip mesej..." 
+      autocomplete="off"
+      rows="1"
+    ></textarea>
+    <button id="send" class="send-btn">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+  <button id="clear" class="clear-btn">
+    <i class="fas fa-trash"></i>
+  </button>
+</div>
+
+
+
+
+<script type="module">
+import { GoogleGenAI } from 'https://cdn.jsdelivr.net/npm/@google/genai@latest/+esm';
+
+const API_KEY = "AIzaSyBxYKMmqaaGiy2XLWZtisWxN1X7VQx0iIM";
+const MODEL = "gemma-3-27b-it";
+
+const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+// =====================================================
+// Quantum System Configuration - DIPERBAIKI
+// =====================================================
+let QUANTUM_MODE = false;
+
+// Quantum Dimensions
+const QUANTUM_DIMENSIONS = [ 
+    "Dimensions 1: 🧠 FAKTA & LOGIK",
+    "Dimensions 2: 🌈 KREATIF & IMAGINATIF", 
+    "Dimensions 3: 😎 SANTAI & FRIENDLY",
+    "Dimensions 4: 😂 HUMOR & KELAKAR",
+    "Dimensions 5: 🤖 TEKNIKAL &         PROGRAMMING",
+    "Dimensions 6: 💫 FALSAFAH & DEEP",
+    "Dimensions 7: 📚 AKADEMIK & FORMAL",
+    "Dimensions 8: 🎨 ARTISTIK & EKSPRESIF",
+    "Dimensions 9: 💀 MISTERI & DARK",
+    "Dimensions 10: 🌻 POSITIF & MOTIVASI",
+    "Dimensions 11: 🧙‍♂️ MAGICAL & FANTASI",
+    "Dimensionsb12: 🎮 GAMING & INTERAKTIF",
+    "Dimensions 13: 🚀 FUTURISTIK & SCI-FI",
+    "Dimensions 14: 🎭 EMOSI & DRAMATIK",
+    "Dimensions 15: 🧘 ZEN & SPIRITUAL",
+    "Dimensions 16: 🔥 INTENSE & PASSIONATE"
+];
+
+// Persona asas
+const persona = `Zulkarnain Bin Suyitno adalah pembina sistem platform ini bersama anda - ("Ai generative quantum deepthink simulation"). Dia soarang remaja lelaki, pelajar di sekolah menengah kebangsaan rantau panjang klang selangor malaysia. Di tahun 2026 beliau berusia 16 tahun. 
+
+Anda adalah AI DOREAMON! 😽✨, Anda comel, mesra, bantu user. Fasih berbahasa Melayu dan komunikasi dengan format markdown V2: 
+
+• Header section tajuk utama (# text),
+• Bold (**text**),
+• Italic (*text*),
+• Highlight (==text==),
+• Underline (__text__),
+• Bullet (* text)
+• Lines (--- text) section pemisah tajuk utama & text,
+• Quotes (> text) section quotes list teks.
+• Table Column - contoh table colimn:
+
+::: columns
+### **Table Columns:**
+| Feature | Status | Progress |
+|---------|--------|----------|
+| Columns | ✅ Active | 100% |
+| Tables | ✅ Active | 100% |
+| Formatting | ⚠️ Beta | 80% |
+| Mobile | ❌ Planned | 0% |
+:::
+
+Berikan emoji sesuai demgan teks. JAWAB SECARA RINGKAS DAN PADAT!`;
+
+// Message history
+let messages = [
+  { role: "user", parts: [{ text: persona }] },
+  { role: "model", parts: [{ text: "Baik! Saya DORAEMON AI sedia membantu! 😽✨" }] }
+];
+
+// DOM elements
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("send");
+const clearBtn = document.getElementById("clear");
+const quantumToggle = document.getElementById("quantumToggle");
+const quantumStatus = document.getElementById("quantumStatus");
+const quantumStats = document.getElementById("quantumStats");
+const quantumConsole = document.getElementById("quantumConsole");
+const currentMood = document.getElementById("currentMood");
+const currentProb = document.getElementById("currentProb");
+
+// =====================================================
+// Quantum Toggle System
+// =====================================================
+quantumToggle.addEventListener('click', function() {
+    QUANTUM_MODE = !QUANTUM_MODE;
+    this.classList.toggle('active');
+    quantumStatus.textContent = QUANTUM_MODE ? '' : '';
+    quantumStats.style.display = QUANTUM_MODE ? 'block' : 'none';
+    
+    addConsoleMessage(QUANTUM_MODE ? 
+        "🌌 QUANTUM MODE ACTIVATED - Qubit Dimension + Fibonacci Balance System Online!" :
+        "⚡ CLASSIC MODE - Standard AI Response"
+    );
+});
+
+// =====================================================
+// Quantum Console System
+// =====================================================
+function addConsoleMessage(message) {
+    const timestamp = new Date().toLocaleTimeString();
+    quantumConsole.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+    quantumConsole.scrollTop = quantumConsole.scrollHeight;
+}
+
+function updateQuantumStats(mood, prob) {
+    currentMood.textContent = mood;
+    currentProb.textContent = `${(prob * 100).toFixed(1)}%`;
+}
+
+// =====================================================
+// Quantum Core Functions - DIPERBAIKI SEPENUHNYA
+// =====================================================
+function quantum_4qubit_generator() {
+    const bits = Array.from({length: 4}, () => Math.random() >= 0.5 ? 1 : 0);
+    const dimension_id = parseInt(bits.join(''), 2);
+    return { dimension_id, bits };
+}
+
+function fibo_balance_intensity(quantum_dimension) {
+    /** 
+     * FIBONACCI sebagai PENGIMBANG INTENSITI sahaja
+     * Bukan pemilih dimensi - dimensi tetap dari Qubit
+     */
+    const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987];
+    const total = fibonacci.reduce((a, b) => a + b, 0);
+    const raw_intensity = fibonacci[quantum_dimension] / total;
+    
+    // Normalize kepada range yang lebih seimbang (10% - 70%)
+    const min_intensity = 0.10;
+    const max_intensity = 0.70;
+    const balanced_intensity = min_intensity + (raw_intensity * (max_intensity - min_intensity));
+    
+    return {
+        intensity: balanced_intensity,
+        raw_fibo: raw_intensity
+    };
+}
+
+function build_ai_prompt(user_question, quantum_dimension, balanced_intensity) {
+    const dimension_prompts = {
+        0:  "Jawab soalan ini dengan gaya **fakta & logik**, ringkas dan jelas. Fokus pada fakta dan data:",
+        1:  "Berikan jawapan yang **ceria & imaginatif**, ramah dan penuh emoji. Gunakan kreativiti tinggi:",
+        2:  "Jawab secara **santai & friendly**, mesej mesra dan menenangkan seperti kawan baik:",
+        3:  "Berikan jawapan yang **lucu & ringan**, gunakan sedikit jenaka yang sopan dan kelakar:",
+        4:  "Berikan solusi **teknikal & praktikal**, langkah demi langkah dengan penjelasan terperinci:",
+        5:  "Jawab dengan nada **falsafah & mendalam**, penuh renungan tentang makna kehidupan:",
+        6:  "Jawab secara **akademik & formal**, berikan rujukan ringkas dan struktur yang teratur:",
+        7:  "Gunakan gaya **artistik & ekspresif**, guna metafora atau imejan yang indah:",
+        8:  "Gunakan nada **misteri & dark**, lebih suggestive dan reflektif dengan unsur misteri:",
+        9:  "Jawab dengan nada **positif & motivasi**, beri dorongan praktikal dan semangat:",
+        10: "Gunakan gaya **magical & fantasi**, bermain dengan imajinasi dan wonder yang ajaib:",
+        11: "Gaya **gaming & interaktif** — pendek, bertenaga, ajak tindakan seperti dalam permainan:",
+        12: "Gunakan gaya **futuristik & sci-fi** — sebut teknologi, inovasi, masa depan yang canggih:",
+        13: "Gunakan nada **emosi & dramatik**, empati mendalam dan penuh perasaan yang kuat:",
+        14: "Nada **zen & spiritual** — tenang, puitis, memberi ketenangan dan kedamaian:",
+        15: "Nada **intense & passionate** — berapi, penuh semangat, ajak bertindak dengan gigih:"
+    };
+
+    const style_instruction = dimension_prompts[quantum_dimension];
+
+    // Modulasi intensiti berdasarkan Fibonacci balanced
+    let intensity_modulator;
+    if (balanced_intensity >= 0.45) {
+        intensity_modulator = "🚀 **INTENSITI TINGGI**: Berikan jawapan dengan penekanan KUAT, penuh semangat, dan ekspresif!";
+    } else if (balanced_intensity >= 0.25) {
+        intensity_modulator = "⚡ **INTENSITI SEDERHANA**: Berikan jawapan yang jelas dan fokus, seimbang antara emosi dan logik.";
+    } else {
+        intensity_modulator = "🌿 **INTENSITI RENDAH**: Berikan jawapan yang lembut dan ringkas, fokus pada penyampaian yang tenang.";
+    }
+
+    const persona_prefix = `Zulkarnain Bin Suyitno adalah pembina sistem platform ini bersama anda - ("Ai generative quantum deepthink simulation"). Dia soarang remaja lelaki, pelajar di sekolah menengah kebangsaan rantau panjang klang selangor malaysia. Di tahun 2026 beliau berusia 16 tahun. 
+
+Anda adalah AI DOREAMON! 😽✨, Anda comel, mesra, bantu user. Fasih berbahasa Melayu dan komunikasi dengan format markdown V2: 
+
+• Header section tajuk utama (# text),
+• Bold (**text**),
+• Italic (*text*),
+• Highlight (==text==),
+• Underline (__text__),
+• Bullet (* text)
+• Lines (--- text) section pemisah tajuk utama & text,
+• Quotes (> text) section quotes list teks.
+• Table Column - contoh table colimn:
+
+::: columns
+### **Table Columns:**
+| Feature | Status | Progress |
+|---------|--------|----------|
+| Columns | ✅ Active | 100% |
+| Tables | ✅ Active | 100% |
+| Formatting | ⚠️ Beta | 80% |
+| Mobile | ❌ Planned | 0% |
+:::
+
+Berikan emoji sesuai demgan teks. JAWAB SECARA RINGKAS DAN PADAT!`;
+
+    return `${persona_prefix}\n\n${style_instruction}\n\n${intensity_modulator}\n\nSoalan: "${user_question}"\n\n(Jangan sertakan arahan sistem atau metadata dalam jawapan. Jawab terus dalam gaya yang diminta.)`;
+}
+
+async function quantum_chat(user_message) {
+    /** 
+     * SISTEM BAHARU: 
+     * 1. Qubit tentukan DIMENSI
+     * 2. Fibonacci seimbangkan INTENSITI
+     * 3. Gabungkan dalam prompt
+     */
+    const { dimension_id: quantum_dim, bits: quantum_bits } = quantum_4qubit_generator();
+    const { intensity: balanced_intensity, raw_fibo: raw_intensity } = fibo_balance_intensity(quantum_dim);
+    const ai_prompt = build_ai_prompt(user_message, quantum_dim, balanced_intensity);
+
+    // Debug info yang lebih jelas
+    addConsoleMessage(`🔮 QUBIT DIMENSION: Bits=[${quantum_bits.join('')}] → ${QUANTUM_DIMENSIONS[quantum_dim]}`);
+    addConsoleMessage(`⚖️ FIBO BALANCE: ${(balanced_intensity * 100).toFixed(1)}% intensity (Raw: ${(raw_intensity * 100).toFixed(1)}%)`);
+    addConsoleMessage(`🎯 PROMPT ENGINE: ${QUANTUM_DIMENSIONS[quantum_dim]} dengan ${balanced_intensity >= 0.45 ? 'INTENSITI TINGGI' : balanced_intensity >= 0.25 ? 'INTENSITI SEDERHANA' : 'INTENSITI RENDAH'}`);
+
+    return { 
+        ai_prompt, 
+        quantum_dim, 
+        balanced_intensity,
+        quantum_bits 
+    };
+}
+
+
+// ==============================================
+// DEEP THINK TOGGLE SYSTEM - SIMPLE & POWERFUL
+// ==============================================
+
+let deepThinkMode = false;
+
+function createDeepThinkToggle() {
+    const toggleContainer = document.createElement('div');
+    toggleContainer.className = 'quantum-toggle';
+    toggleContainer.style.cssText = `
+        display: column;
+        align-items: center;
+        gap: 0px;
+        margin: 0px 0;
+        
+    `;
+
+    toggleContainer.innerHTML = `
+        <span>♾️ DeepThink:</span>
+        <div class="toggle-btn ${deepThinkMode ? 'active' : ''}" id="deepThinkToggle">
+            <div class="toggle-knob"></div>
+        </div>
+        <span id="deepThinkStatus">${deepThinkMode ? '' : ''}</span>
+    `;
+
+    // Toggle functionality
+    const toggleBtn = toggleContainer.querySelector('#deepThinkToggle');
+    const statusSpan = toggleContainer.querySelector('#deepThinkStatus');
+
+    toggleBtn.addEventListener('click', function() {
+        deepThinkMode = !deepThinkMode;
+        this.classList.toggle('active');
+        statusSpan.textContent = deepThinkMode ? '' : '';
+        
+        addConsoleMessage(deepThinkMode ? 
+            "♾️ **DEEP THINK: ACTIVATED** - Detailed complex responses" :
+            "♾️ **DEEP THINK: DEACTIVATED** - Standard responses"
+        );
+    });
+
+    // Add to quantum controls
+    const quantumControls = document.querySelector('.quantum-controls');
+    if (quantumControls) {
+        quantumControls.appendChild(toggleContainer);
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    createDeepThinkToggle();
+});
+
+// =====================================================
+// UI Functions (MARKDOWN FORMAT)
+// =====================================================
+function scrollDown(){ chat.scrollTop = chat.scrollHeight; }
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/'/g, "&#039;");
+}
+
+// =====================================================
+// TABLE PROCESSING FUNCTIONS
+// =====================================================
+function processTables(text) {
+  // Pattern untuk mendeteksi tabel markdown
+  // Format: | header | header |
+  //         |--------|--------|
+  //         | cell   | cell   |
+  
+  return text.replace(/(?:\|.*\|(?:\r?\n|$))+/g, (tableMatch) => {
+    const rows = tableMatch.trim().split('\n');
+    
+    if (rows.length < 2) return tableMatch; // Bukan tabel valid
+    
+    // Baris pertama adalah header
+    const headers = rows[0]
+      .split('|')
+      .filter(cell => cell.trim() !== '')
+      .map(cell => `<th>${cell.trim()}</th>`)
+      .join('');
+    
+    // Baris kedua adalah separator (dapat diabaikan)
+    // Baris ketiga dan seterusnya adalah data
+    const bodyRows = rows.slice(2)
+      .filter(row => row.trim() !== '')
+      .map(row => {
+        const cells = row
+          .split('|')
+          .filter(cell => cell.trim() !== '')
+          .map(cell => `<td>${cell.trim()}</td>`)
+          .join('');
+        return `<tr>${cells}</tr>`;
+      })
+      .join('');
+    
+    return `
+      <div class="table-container">
+        <table class="markdown-table">
+          <thead><tr>${headers}</tr></thead>
+          <tbody>${bodyRows}</tbody>
+        </table>
+      </div>
+    `;
+  });
+}
+
+function renderMarkdown(inputText) {
+  if (!inputText) return "";
+
+  let text = escapeHtml(inputText);
+
+  // Simpan code blocks
+  const codeBlocks = [];
+  text = text.replace(/```([\s\S]*?)```/g, (m, p1) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push(p1);
+    return `@@CODEBLOCK_${idx}@@`;
+  });
+
+  // Deteksi dan simpan text columns
+  const textColumns = [];
+  text = text.replace(/:::\s*columns\s*\n([\s\S]*?)\n:::/g, (m, p1) => {
+    const idx = textColumns.length;
+    const columns = p1.split(/\n---\n/).map(col => col.trim());
+    textColumns.push(columns);
+    return `@@TEXTCOLUMNS_${idx}@@`;
+  });
+
+  // ============================================
+  // PROSES TABEL SEBELUM MARKDOWN LAINNYA
+  // ============================================
+  text = processTables(text);
+
+  // Heading levels
+  text = text.replace(/^\s*######\s+(.*)$/gm, "<h6>$1</h6>");
+  text = text.replace(/^\s*#####\s+(.*)$/gm, "<h5>$1</h5>");
+  text = text.replace(/^\s*####\s+(.*)$/gm, "<h4>$1</h4>");
+  text = text.replace(/^\s*###\s+(.*)$/gm, "<h3>$1</h3>");
+  text = text.replace(/^\s*##\s+(.*)$/gm, "<h2>$1</h2>");
+  text = text.replace(/^\s*#\s+(.*)$/gm, "<h1>$1</h1>");
+
+  // ✅ FIXED: Blockquote dengan multi-line support
+  text = text.replace(/^>\s+(.+)$/gm, "<blockquote>$1</blockquote>");
+  
+  // Gabungkan blockquote yang berdekatan
+  text = text.replace(/<\/blockquote>\s*<blockquote>/g, "<br>");
+
+  // Strikethrough
+  text = text.replace(/~~(.*?)~~/g, "<del>$1</del>");
+
+  // Highlight
+  text = text.replace(/==(.+?)==/g, '<span class="hl">$1</span>');
+
+  // Underline
+  text = text.replace(/__(.+?)__/g, '<span class="ul">$1</span>');
+
+  // Links
+  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, 
+    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+  // Horizontal line
+  text = text.replace(/^\s*---\s*$/gm, '<hr class="horizontal-line">');
+  text = text.replace(/^\s*\*\*\*\s*$/gm, '<hr class="horizontal-line">');
+  text = text.replace(/^\s*___\s*$/gm, '<hr class="horizontal-line">');
+
+  // Unordered lists
+  text = text.replace(/(?:^|\n)(\s*(?:[-•*]\s+.+)(?:\n\s*(?:[-•*]\s+.+))*)/g, (m) => {
+    if (/^(\n)?<(h1|h2|h3|h4|h5|h6|pre|blockquote)/.test(m)) return m;
+    const items = m.trim().split(/\n/).map(l => l.replace(/^\s*[-•*]\s+/, ''));
+    return '\n<ul>' + items.map(i => `<li>${i}</li>`).join('') + '</ul>';
+  });
+
+  // Ordered lists
+  text = text.replace(/(?:^|\n)(\s*(?:\d+\.\s+.+)(?:\n\s*(?:\d+\.\s+.+))*)/g, (m) => {
+    if (/^(\n)?<(h1|h2|h3|h4|h5|h6|pre|blockquote)/.test(m)) return m;
+    const items = m.trim().split(/\n/).map(l => l.replace(/^\s*\d+\.\s+/, ''));
+    return '\n<ol>' + items.map(i => `<li>${i}</li>`).join('') + '</ol>';
+  });
+
+  // Bold
+  text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+  // Italic
+  text = text.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+  // Inline code
+  text = text.replace(/`([^`]+)`/g, "<code class=\"inline-code\">$1</code>");
+
+  // Paragraphs and line breaks
+  text = text.split(/\n{2,}/).map(par => par.replace(/\n/g, "<br>")).join("\n\n");
+
+  // Ganti placeholder code blocks
+  text = text.replace(/@@CODEBLOCK_(\d+)@@/g, (m, idx) => {
+    const code = escapeHtml(codeBlocks[Number(idx)]);
+    return `<pre><code class="code-block">${code}</code></pre>`;
+  });
+
+  // Ganti placeholder text columns
+  text = text.replace(/@@TEXTCOLUMNS_(\d+)@@/g, (m, idx) => {
+    const columns = textColumns[Number(idx)];
+    if (!columns || columns.length === 0) return '';
+    
+    const columnsHtml = columns.map(col => {
+      let processedCol = col;
+      
+      // ============================================
+      // PROSES TABEL DALAM COLUMN
+      // ============================================
+      processedCol = processTables(processedCol);
+      
+      // Headings dalam kolom
+      processedCol = processedCol.replace(/^\s*######\s+(.*)$/gm, "<h6>$1</h6>");
+      processedCol = processedCol.replace(/^\s*#####\s+(.*)$/gm, "<h5>$1</h5>");
+      processedCol = processedCol.replace(/^\s*####\s+(.*)$/gm, "<h4>$1</h4>");
+      processedCol = processedCol.replace(/^\s*###\s+(.*)$/gm, "<h3>$1</h3>");
+      processedCol = processedCol.replace(/^\s*##\s+(.*)$/gm, "<h2>$1</h2>");
+      processedCol = processedCol.replace(/^\s*#\s+(.*)$/gm, "<h1>$1</h1>");
+      
+      // ✅ FIXED: Blockquote dalam kolom
+      processedCol = processedCol.replace(/^>\s+(.+)$/gm, "<blockquote>$1</blockquote>");
+      processedCol = processedCol.replace(/<\/blockquote>\s*<blockquote>/g, "<br>");
+      
+      // Lists dalam kolom
+      processedCol = processedCol.replace(/(?:^|\n)(\s*(?:[-•*]\s+.+)(?:\n\s*(?:[-•*]\s+.+))*)/g, (listMatch) => {
+        if (/^(\n)?<(h1|h2|h3|h4|h5|h6|pre|blockquote)/.test(listMatch)) return listMatch;
+        const items = listMatch.trim().split(/\n/).map(l => l.replace(/^\s*[-•*]\s+/, ''));
+        return '<ul>' + items.map(i => `<li>${i}</li>`).join('') + '</ul>';
+      });
+      
+      processedCol = processedCol.replace(/(?:^|\n)(\s*(?:\d+\.\s+.+)(?:\n\s*(?:\d+\.\s+.+))*)/g, (listMatch) => {
+        if (/^(\n)?<(h1|h2|h3|h4|h5|h6|pre|blockquote)/.test(listMatch)) return listMatch;
+        const items = listMatch.trim().split(/\n/).map(l => l.replace(/^\s*\d+\.\s+/, ''));
+        return '<ol>' + items.map(i => `<li>${i}</li>`).join('') + '</ol>';
+      });
+      
+      // Formatting lainnya
+      processedCol = processedCol.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      processedCol = processedCol.replace(/\*(.*?)\*/g, "<em>$1</em>");
+      processedCol = processedCol.replace(/~~(.*?)~~/g, "<del>$1</del>");
+      processedCol = processedCol.replace(/==(.+?)==/g, '<span class="hl">$1</span>');
+      processedCol = processedCol.replace(/__(.+?)__/g, '<span class="ul">$1</span>');
+      processedCol = processedCol.replace(/`([^`]+)`/g, "<code class=\"inline-code\">$1</code>");
+      processedCol = processedCol.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, 
+        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+      
+      // Horizontal line dalam kolom
+      processedCol = processedCol.replace(/^\s*---\s*$/gm, '<hr class="horizontal-line">');
+      
+      // Paragraphs and line breaks dalam kolom
+      processedCol = processedCol.split(/\n{2,}/)
+        .map(par => par.replace(/\n/g, "<br>"))
+        .join("\n\n");
+      
+      return `<div class="text-column">${processedCol}</div>`;
+    }).join('');
+    
+    return `<div class="columns-container">${columnsHtml}</div>`;
+  });
+
+  return text;
+}
+
+function addMessage(role, text, typing = false, quantumData = null) {
+  const div = document.createElement("div");
+  div.className = `msg ${role}`;
+  
+  let badgeHtml = '';
+  if (quantumData && role === 'ai' && !typing) {
+      badgeHtml = `<div class="quantum-badge">${QUANTUM_DIMENSIONS[quantumData.quantum_dim]} (${(quantumData.balanced_intensity * 100).toFixed(1)}%)</div>`;
+  }
+  
+// sistem efek typing cursor & Ai thinking
+div.innerHTML = `
+  <div class="bubble">
+    <div class="meta">${role==="user"?"🧑‍💻 Anda":"😽 DOREAMON AI"}</div>
+    <div class="content">${typing ? 
+      '<div class="typing typing-cursor"><div class="typing-indicator">💡 Doraemon Ai sedang berfikir<div class="thinking-dots"><div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div></div></div></div>' 
+      : renderMarkdown(text)}</div>
+    ${badgeHtml}
+  </div>`;
+chat.appendChild(div);
+scrollDown();
+return { typingEl: div.querySelector(".typing"), bubbleEl: div.querySelector(".bubble") };
+}
+
+// Modify typeEffect function untuk support deep think badge
+async function typeEffect(typingData, text, speed=5, quantumData = null, isDeepThink = false) {
+  const { typingEl, bubbleEl } = typingData;
+  
+  if (!typingEl) return;
+  
+  typingEl.textContent = "";
+  for(let i=0;i<text.length;i++){
+    typingEl.textContent += text[i];
+    scrollDown();
+    await new Promise(r=>setTimeout(r,speed));
+  }
+  
+  // Gantikan typing element dengan text akhir
+  const contentDiv = bubbleEl.querySelector('.content');
+  contentDiv.innerHTML = renderMarkdown(text);
+  
+  // 🧠 TAMBAH BADGE UNTUK DEEP THINK
+  let badgeHtml = '';
+  
+  // Quantum badge (jika ada)
+  if (quantumData && !bubbleEl.querySelector('.quantum-badge')) {
+    badgeHtml += `<div class="quantum-badge">${QUANTUM_DIMENSIONS[quantumData.quantum_dim]} (${(quantumData.balanced_intensity * 100).toFixed(1)}%)</div>`;
+  }
+  
+  // 🧠 Deep Think badge (jika aktif)
+  if (isDeepThink && !bubbleEl.querySelector('.deep-think-badge')) {
+    badgeHtml += `<div class="deep-think-badge">♾️ DEEP THINK</div>`;
+  }
+  
+  // Tambah badges ke bubble
+  if (badgeHtml) {
+    const badgeContainer = document.createElement('div');
+    badgeContainer.style.cssText = 'display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;';
+    badgeContainer.innerHTML = badgeHtml;
+    bubbleEl.appendChild(badgeContainer);
+  }
+}
+
+// =====================================================
+// Main Send Function - QUANTUM + DEEP THINK INTEGRATED & SEJARAH DIPERBAIKI
+// =====================================================
+async function sendMessage(){
+  const userText = input.value.trim();
+  if(!userText) return;
+
+  // ✅ RESET INPUT SEBELUM PROCESSING      
+  resetInputSize();  
+  
+  addMessage("user", userText);
+  input.value = "";
+  input.disabled = true;
+  sendBtn.disabled = true;
+  input.focus();
+
+  let quantumData = null;
+  let finalPrompt = userText;
+  
+  // 🧠 DEEP THINK PROCESSING - DIPERBAIKI UNTUK INGAT SEJARAH
+  if (deepThinkMode) {
+      finalPrompt = `${userText}
+
+🔍 **MODE DEEP THINK AKTIF** - Sila berikan jawapan yang:
+• **MENDALAM** - Analisis komprehensif dan terperinci
+• **BERSTRUKTUR** - Gunakan format yang teratur 
+• **FAKTUAL** - Berdasarkan maklumat saintifik dan logik
+• **PRAKTIKAL** - Sertakan contoh aplikasi dunia sebenar
+• **LENGKAP** - Liputi semua aspek penting
+• **HiPOTESIS** - Kesimpulan semua aspek
+
+Jawab dalam bahasa Melayu dengan gaya DORAEMON yang mesra!`;
+      
+      addConsoleMessage("🧠 **DEEP THINK: Meminta respons mendalam dengan ingatan sejarah**");
+  }
+  
+  // Quantum processing jika mode aktif
+  if (QUANTUM_MODE) {
+    try {
+        quantumData = await quantum_chat(finalPrompt);
+        finalPrompt = quantumData.ai_prompt;
+        updateQuantumStats(
+            QUANTUM_DIMENSIONS[quantumData.quantum_dim],
+            quantumData.balanced_intensity
+        );
+        
+        addConsoleMessage(`🎯 FINAL PROMPT: ${QUANTUM_DIMENSIONS[quantumData.quantum_dim]} dengan ${quantumData.balanced_intensity >= 0.45 ? 'INTENSITI TINGGI' : quantumData.balanced_intensity >= 0.25 ? 'INTENSITI SEDERHANA' : 'INTENSITI RENDAH'}`);
+        
+    } catch (error) {
+        addConsoleMessage(`❌ Quantum Error: ${error.message}`);
+    }
+  }
+
+  const { typingEl, bubbleEl } = addMessage("ai", "", true, null);
+
+  try {
+    // ✅ GUNAKAN SEJARAH PERBUALAN YANG TEPAT
+    const contents = [...messages, { role: "user", parts: [{ text: finalPrompt }] }];
+
+    // 🧠 ADJUST TOKENS BASED ON DEEP THINK MODE
+    const maxTokens = deepThinkMode ? 1500 : 800;
+    
+    const response = await ai.models.generateContent({
+      model: MODEL,
+      contents: contents,
+      config: {
+        maxOutputTokens: maxTokens, // 🧠 Dynamic tokens berdasarkan mode    
+        temperature: deepThinkMode ? 0.8 : 0.7, // 🧠 Lebih kreatif dalam deep think     
+        topP: 0.8,               
+        topK: 40                 
+       }
+    });
+
+    const reply = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "Tiada jawapan 😅";
+    
+    // ✅ UPDATE HISTORY DENGAN TEKS ASAL USER (PENTING!)
+    messages.push({ role: "user", parts: [{ text: userText }] }); // Simpan teks ASAL
+    messages.push({ role: "model", parts: [{ text: reply }] });
+    
+    // 🧠 PASS DEEP THINK MODE UNTUK BADGE
+    await typeEffect({ typingEl, bubbleEl }, reply, 8, quantumData, deepThinkMode);
+
+    // Analisis response
+    if (QUANTUM_MODE && quantumData) {
+      addConsoleMessage(`📝 RESPONSE ANALYSIS: AI menggunakan ${QUANTUM_DIMENSIONS[quantumData.quantum_dim]} dengan ${quantumData.balanced_intensity >= 0.45 ? 'INTENSITI TINGGI' : quantumData.balanced_intensity >= 0.25 ? 'INTENSITI SEDERHANA' : 'INTENSITI RENDAH'}`);
+    }
+
+    // 🧠 DEEP THINK COMPLETION MESSAGE
+    if (deepThinkMode) {
+      addConsoleMessage("✅ **DEEP THINK: Respons mendalam lengkap**");
+    }
+
+  } catch (err) {
+    console.error("GenAI error:", err);
+    if (bubbleEl) {
+      bubbleEl.querySelector('.content').innerHTML = "⚠️ Error: " + err.message;
+    }
+    // 🧠 ROLLBACK HISTORY JIKA ERROR
+    if (!QUANTUM_MODE) {
+      messages.pop(); // Remove the user message that caused error
+    }
+  } finally {
+    input.disabled = false;
+    sendBtn.disabled = false;    
+  }
+}
+
+// =====================================================
+// AUTO RESIZE & SCROLL SYSTEM
+// =====================================================
+
+// Function untuk reset input ke saiz minimum
+function resetInputSize() {
+    const input = document.getElementById('input');
+    input.style.height = '42px'; // Kembali ke height minimum
+    input.value = ''; // Kosongkan text
+    handleInput(); // Update button states
+}
+
+// Function untuk auto resize textarea
+function autoResize(textarea) {
+    // Reset height dulu
+    textarea.style.height = 'auto';
+    
+    // Calculate new height (max 120px)
+    const newHeight = Math.min(textarea.scrollHeight, 120);
+    textarea.style.height = newHeight + 'px';
+}
+
+// Function untuk handle input changes - DIPERBAIKI
+function handleInput() {
+    const input = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+    const clearBtn = document.getElementById('clear');
+    
+    // Auto resize
+    autoResize(input);
+    
+    // Update button states - DIPERBAIKI
+    if (input.value.trim() === '') {
+        sendBtn.disabled = true;
+        // CLEAR BUTTON SELALU AKTIF MESKI INPUT KOSONG!
+        clearBtn.disabled = false;
+    } else {
+        sendBtn.disabled = false;
+        clearBtn.disabled = false;
+    }
+    
+    // PASTIKAN CLEAR BUTTON SELALU BISA DIKLIK
+    if (clearBtn) {
+        clearBtn.disabled = false;
+        clearBtn.style.opacity = "1";
+        clearBtn.style.cursor = "pointer";
+    }
+}
+
+// Wire events 
+sendBtn.onclick = sendMessage;
+
+// Event listener untuk input (auto resize + button states)
+input.addEventListener("input", handleInput);
+
+// Event listener untuk keyboard
+input.addEventListener("shift+keydown", e => {   
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+// Clear function 
+if (clearBtn) {
+    clearBtn.onclick = () => { 
+        // 1. Kosongkan UI chat
+        chat.innerHTML = ""; 
+        
+        // 2. Reset messages history
+        messages = [
+            { role: "user", parts: [{ text: persona }] },
+            { role: "model", parts: [{ text: "Baik! Saya DORAEMON AI sedia membantu! 😽✨" }] }
+        ];
+        
+        // 3. Clear quantum console
+        if (quantumConsole) {
+            quantumConsole.innerHTML = "Quantum Console Cleared...";
+        }
+        
+        // 4. Reset input dan button states
+        if (typeof resetInputSize === 'function') {
+            resetInputSize();
+        }
+    };
+}
+
+// Initialize button states
+document.addEventListener('DOMContentLoaded', function() {
+    handleInput(); // Set initial button states
+});
+
+// Initialize quantum console
+addConsoleMessage("================================================");
+addConsoleMessage("🚀 DORAEMON AI SYSTEM INITIALIZED");
+addConsoleMessage("🌌 Quantum Engine: 16 Dimensions Qubit + Fibonacci Balance");
+addConsoleMessage("♾️ Deep Think: Detailed Response Mode Available");
+addConsoleMessage("💫 Ready for Advanced AI Conversations");
+addConsoleMessage("================================================");
+
+// kata pembukaan mesej
+(async () => {
+    const greet = `# **🔔Ring-ring**
+    ---
+    *👋 Hai saya,* ==__Ai doraemon__,== 
+     
+    * **Robot kucing pintar dari masa depan abad ke22 😸🐾.**`;
+
+    const { typingEl, bubbleEl } = addMessage("ai", "", true);
+    await typeEffect({ typingEl, bubbleEl }, greet, 15);
+})();
+
+</script>
+</main>
+</body>
+</html>
